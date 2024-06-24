@@ -14,6 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
     const token = ref(useLocalStorage("token", ""));
 
     const logOut = () => {
+        localStorage.removeItem("token");
         authStatus.value = AuthStatus.Unauthenticated;
         user.value = undefined;
         token.value = "";

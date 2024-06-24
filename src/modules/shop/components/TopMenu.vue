@@ -13,20 +13,20 @@
             <div class="mt-2 sm:mt-0 sm:flex md:order-2">
                 <!-- Login Button -->
                 <template v-if="authStore.isAuthenticated">
-                    <Button v-if="authStore.isAdmin" type="button"
+                    <RouterLink to="/admin" v-if="authStore.isAdmin" type="button"
                         class="round mr-3 hidden border border-blue-700 py-1.5 px-6 text-center text-sm font-medium text-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 md:inline-block rounded-lg">
-                        Admin</Button>
+                        Admin</RouterLink>
                     <Button @click="authStore.logOut()" to="/auth/login" type="button"
                         class="round mr-3 hidden border border-blue-700 py-1.5 px-6 text-center text-sm font-medium text-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 md:inline-block rounded-lg">
                         Logout</Button>
                 </template>
 
-                <template v-else>
+                <template v-if="!authStore.isAuthenticated">
                     <RouterLink to="/auth/login" type="button"
-                        class="rounde mr-3 hidden border border-blue-700 py-1.5 px-6 text-center text-sm font-medium text-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 md:inline-block rounded-lg">
+                        class="round mr-3 hidden border border-blue-700 py-1.5 px-6 text-center text-sm font-medium text-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 md:inline-block rounded-lg">
                         Login</RouterLink>
                     <RouterLink to="/auth/register" type="button"
-                        class="rounde mr-3 hidden bg-blue-700 py-1.5 px-6 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 md:mr-0 md:inline-block rounded-lg">
+                        class="round mr-3 hidden bg-blue-700 py-1.5 px-6 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 md:mr-0 md:inline-block rounded-lg">
                         Register</RouterLink>
                 </template>
 
