@@ -7,7 +7,7 @@ import type { LoginError, LoginSuccess } from "@/modules/common/interfaces/auth.
 
 
 export const loginAction = async (email: string, password: string): Promise<LoginSuccess | LoginError> => {
-    try {
+    try {        
         const { data } = await tesloApi.post<AuthResponse>('/auth/login', { email, password });
         return {
             ok: true,
@@ -15,8 +15,8 @@ export const loginAction = async (email: string, password: string): Promise<Logi
             token: data.token
         };
     }
-    catch (error) {
-        if (isAxiosError(error) && error.response?.status === 401) {
+    catch (error) {                
+        if (isAxiosError(error) && error.response?.status === 401) {            
             return {
                 ok: false,
                 message: 'Invalid credentials'

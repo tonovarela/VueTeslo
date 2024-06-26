@@ -1,7 +1,7 @@
 import { tesloApi } from "@/api/tesloApi"
 import type { Product } from "../interfaces/product.interface"
 
-const getProductImageAction = (imageName: string) => imageName.includes("http") ? imageName : `${import.meta.env.VITE_TESLO_API_URL}/files/product/${imageName}`;
+export const getProductImageAction = (imageName: string) => imageName.includes("http") ? imageName : `${import.meta.env.VITE_TESLO_API_URL}/files/product/${imageName}`;
 
 export const getProductsAction = async (page: number = 1, limit: number = 10) => {
     try {
@@ -10,7 +10,7 @@ export const getProductsAction = async (page: number = 1, limit: number = 10) =>
             return { ...product, images: product.images.map(getProductImageAction) }
         });
     } catch (error) {
-        console.log(error)
+        
         throw new Error("Error while fetching products")
     }
 }
