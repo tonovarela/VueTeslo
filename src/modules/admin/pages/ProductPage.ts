@@ -58,6 +58,7 @@ export default defineComponent({
 
         const { fields: sizes, remove: removeSize, push: pushSize } = useFieldArray<string>('sizes');
         const { fields: images } = useFieldArray<string>('images');
+        const { fields: images1 } = useFieldArray<string>('images1');
 
         const onSubmit = handleSubmit((value) => {
             console.log({ value });
@@ -84,8 +85,7 @@ export default defineComponent({
         watch(
             product,
             () => {
-                if (!product) return;
-
+                if (!product.value) return;
                 resetForm({
                     values: product.value,
                 });
@@ -117,6 +117,7 @@ export default defineComponent({
 
             //sizes,
             images,
+
 
             // Getters
             allSizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],

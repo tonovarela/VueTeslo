@@ -3,7 +3,7 @@ import "./assets/main.css"
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { VueQueryPlugin } from '@tanstack/vue-query'
-
+import "@/config/yup";
 
 import Toast from "vue-toastification";
 // Import the CSS or use your own!
