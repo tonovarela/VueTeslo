@@ -5,12 +5,13 @@ export const getProductImageAction = (imageName: string) => imageName.includes("
 
 export const getProductsAction = async (page: number = 1, limit: number = 10) => {
     try {
-        const { data } = await tesloApi.get<Product[]>(`/products?limit=${limit}&offset=${page * limit}`)
+
+        const { data } = await tesloApi.get<Product[]>(`/products?limit=${limit}&offset=${(page - 1) * limit}`)
         return data.map((product) => {
             return { ...product, images: product.images.map(getProductImageAction) }
         });
     } catch (error) {
-        
+
         throw new Error("Error while fetching products")
     }
 }

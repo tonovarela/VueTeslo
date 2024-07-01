@@ -49,7 +49,6 @@ export const useAuthStore = defineStore('auth', () => {
             const respSuccess = loginResponse as LoginSuccess;
             authStatus.value = AuthStatus.Authenticated;
             user.value = respSuccess.user;
-            console.log("user", respSuccess);
             token.value = respSuccess.token;
             return true
 

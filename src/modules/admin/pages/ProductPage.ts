@@ -1,13 +1,15 @@
-import { defineComponent, watch, watchEffect } from 'vue';
+import { defineComponent, ref, watch, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
-import { useQuery } from '@tanstack/vue-query';
+import { useQuery, useMutation } from '@tanstack/vue-query';
 import { useFieldArray, useForm } from 'vee-validate';
-import * as yup from 'yup';
-
 
 import CustomInput from '@/modules/common/components/CustomInput.vue';
 import CustomTextArea from '@/modules/common/components/CustomTextArea.vue';
 import { getProductById } from '@/modules/products/actions/get-product-by-id.action';
+import { createUpdateProductAction } from '@/modules/products/actions';
+import { useToast } from 'vue-toastification';
+
+import * as yup from 'yup';
 
 const validationSchema = yup.object({
     title: yup.string().required('Este campo es super importante').min(3, 'Mínimo de 3 letras!!!'),
@@ -33,17 +35,9 @@ export default defineComponent({
     },
     setup(props) {
         const router = useRouter();
+        const toast = useToast();
 
-        const {
-            data: product,
-            isError,
-            isLoading,
-        } = useQuery({
-            queryKey: ['product', props.productId],
-            queryFn: () => getProductById(props.productId),
-            retry: false,
-        });
-
+        const { data: product, refetch, isError, isLoading, } = useQuery({ queryKey: ['product', props.productId], queryFn: () => getProductById(props.productId), retry: false, });
         const { values, defineField, errors, handleSubmit, resetForm, meta } = useForm({
             validationSchema,
             // initialValues: product.value,
@@ -56,12 +50,20 @@ export default defineComponent({
         const [stock, stockAttrs] = defineField('stock');
         const [gender, genderAttrs] = defineField('gender');
 
+
+
         const { fields: sizes, remove: removeSize, push: pushSize } = useFieldArray<string>('sizes');
         const { fields: images } = useFieldArray<string>('images');
-        const { fields: images1 } = useFieldArray<string>('images1');
+        const { mutate, isSuccess: isUpdateSuccess, isPending: isUpdatingProduct, data: updatedProduct } = useMutation({ mutationFn: createUpdateProductAction });
+        const imageFiles = ref<File[]>([]);
+        const onSubmit = handleSubmit((values) => {
+            const product = {
+                ...values,
+                images: [...values.images, ...imageFiles.value],
 
-        const onSubmit = handleSubmit((value) => {
-            console.log({ value });
+            };
+
+            mutate(product);
         });
 
         const toggleSize = (size: string) => {
@@ -74,6 +76,17 @@ export default defineComponent({
                 pushSize(size);
             }
         };
+
+        const onFilesChange = (event: Event) => {
+            const fileInput = event.target as HTMLInputElement;
+            const filesList = fileInput.files;
+            if (!filesList) return;
+            if (filesList.length === 0) return;
+
+            for (const imageFile of filesList) {
+                imageFiles.value.push(imageFile);
+            }
+        }
 
         watchEffect(() => {
             if (isError.value && !isLoading.value) {
@@ -95,13 +108,32 @@ export default defineComponent({
                 immediate: true,
             },
         );
+        watch(() => props.productId, () => {
+            refetch()
+        });
+
+
+        watch(isUpdateSuccess, (value) => {
+            if (!value) { return; }
+            toast.success('Producto actualizado correctamente');
+            router.replace(`/admin/product/${updatedProduct.value!.id}`);
+
+            resetForm({
+                values: updatedProduct.value,
+            });
+            imageFiles.value = [];
+        }
+        )
+
+
+
 
         return {
             // Properties
             values,
             errors,
             meta,
-
+            imageFiles,
             title,
             titleAttrs,
             slug,
@@ -119,17 +151,22 @@ export default defineComponent({
             images,
 
 
+            isUpdatingProduct,
+
+
             // Getters
             allSizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
 
             // Actions
             onSubmit,
             toggleSize,
+            onFilesChange,
 
             hasSize: (size: string) => {
                 const currentSizes = sizes.value.map((s) => s.value);
                 return currentSizes.includes(size);
             },
+            temporalUrl: (file: File) => URL.createObjectURL(file),
         };
     },
 });
